@@ -8,6 +8,10 @@ const MemoryStream = require('memory-stream');
 const Duplex = require('stream').Duplex;
 const Wav = require('node-wav');
 const rootPath = require('app-root-path');
+const https = require('https');
+const { execSync } = require('child_process');
+const ffmpegStatic = require('ffmpeg-static');
+
 
 
 let modelPath = './models/deepspeech-0.9.3-models.pbmm';
@@ -20,7 +24,7 @@ let scorerPath = './models/deepspeech-0.9.3-models.scorer';
 
 model.enableExternalScorer(scorerPath);
 
-let audioFile = './audio/8455-210777-0068.wav';
+let audioFile = transcribeLocalVideo('deepgram.mp4')
 
 if (!Fs.existsSync(audioFile)) {
 	console.log('file missing:', audioFile);
@@ -70,3 +74,26 @@ audioStream.on('finish', () => {
 	console.log('result:', result);
 	Fs.writeFileSync(`${rootPath}/test.txt`, result);
 });
+
+
+
+
+
+// transcribeRemoteVideo('https://www.w3schools.com/html/mov_bbb.mp4');
+
+ function transcribeLocalVideo(filePath) {
+	ffmpeg(`-hide_banner -y -i ${filePath} ${filePath}.wav`);
+  return `${filePath}.wav`
+}
+
+
+
+
+async function ffmpeg(command) {
+	return new Promise((resolve, reject) => {
+		execSync(`${ffmpegStatic} ${command}`, (err, stderr, stdout) => {
+			if (err) reject(err);
+			resolve(stdout);
+		});
+	});
+}
