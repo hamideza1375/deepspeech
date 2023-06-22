@@ -4,7 +4,7 @@
   "description": "Simple audio processing",
   "main": "index.js",
   "scripts": {
-    "start": "node ./index.js"
+    "start": "npx node@14.0.0 ./index.js"
   },
   "dependencies": {
     "app-root-path": "^3.1.0",

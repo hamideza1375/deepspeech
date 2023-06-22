@@ -1,4 +1,6 @@
+//! download models
 //!Sox set to envaironment
+//! npx node@14.0.0 ./index.js
 const DeepSpeech = require('deepspeech');
 const Fs = require('fs');
 const Sox = require('sox-stream');
@@ -41,30 +43,30 @@ function bufferToStream(buffer) {
 
 let audioStream = new MemoryStream();
 bufferToStream(buffer).
-pipe(Sox({
-	global: {
-		'no-dither': true,
-	},
-	output: {
-		bits: 16,
-		rate: desiredSampleRate,
-		channels: 1,
-		encoding: 'signed-integer',
-		endian: 'little',
-		compression: 0.0,
-		type: 'raw'
-	}
-})).
-pipe(audioStream);
+	pipe(Sox({
+		global: {
+			'no-dither': true,
+		},
+		output: {
+			bits: 16,
+			rate: desiredSampleRate,
+			channels: 1,
+			encoding: 'signed-integer',
+			endian: 'little',
+			compression: 0.0,
+			type: 'raw'
+		}
+	})).
+	pipe(audioStream);
 
 audioStream.on('finish', () => {
 	let audioBuffer = audioStream.toBuffer();
-	
+
 	const audioLength = (audioBuffer.length / 2) * (1 / desiredSampleRate);
 	console.log('audio length', audioLength);
-	
+
 	let result = model.stt(audioBuffer);
-	
+
 	console.log('result:', result);
 	Fs.writeFileSync(`${rootPath}/test.txt`, result);
 });
